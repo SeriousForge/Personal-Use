@@ -34,12 +34,29 @@ def calculate_final_cost(event=None):  # Added `event=None` to handle key bindin
         messagebox.showinfo("Final Cost Breakdown", result_message)
     except ValueError:
         messagebox.showerror("Input Error", "Please enter valid numbers for the listed price and shipping.")
+# Function to calculate highest possible bid when having a budget.
+def max_bid():
+    try:
+        budget = float(entry_budget.get()) if entry_budget.get() else 0.0
+        shipping = float(entry_shipping.get()) if entry_shipping.get() else 0.0
+
+        # Calculate the max bid amount that fits within the budget
+        max_bid_amount = budget / (1 + TEXAS_SALES_TAX_RATE) - shipping
+
+        if max_bid_amount < 0:
+            messagebox.showwarning("Warning", "Your budget is too low to cover shipping costs.")
+        else:
+            messagebox.showinfo("Max Bid", f"To stay within budget, your max bid should be: ${max_bid_amount:.2f}")
+            
+    except ValueError:
+        messagebox.showerror("Input Error", "Please enter valid numbers for the listed price and shipping.")
 
 # Function to reset the input fields
 def reset_fields():
     entry_price.delete(0, tk.END)
     entry_shipping.delete(0, tk.END)
-
+    entry_budget.delete(0, tk.END)
+    
 # Create the main application window
 root = tk.Tk()
 root.title("Online Price Calculator")
@@ -53,15 +70,22 @@ tk.Label(root, text="Shipping Cost ($):").grid(row=1, column=0, padx=10, pady=5)
 entry_shipping = tk.Entry(root)
 entry_shipping.grid(row=1, column=1, padx=10, pady=5)
 
+tk.Label(root, text="Budget ($):").grid(row=2, column=0, padx=10, pady=5)
+entry_budget = tk.Entry(root)
+entry_budget.grid(row=2, column=1, padx=10, pady=5)
+
 # Bind the Enter key to the calculate_final_cost function
 root.bind('<Return>', calculate_final_cost)
 
 # Create buttons
 calculate_button = tk.Button(root, text="Calculate", command=calculate_final_cost)
-calculate_button.grid(row=2, column=0, padx=10, pady=10)
+calculate_button.grid(row=3, column=0, padx=10, pady=10)
+
+max_bid_button = tk.Button(root, text="Max Bid", command=max_bid)
+max_bid_button.grid(row=3, column=1, padx=10, pady=10)
 
 reset_button = tk.Button(root, text="Reset", command=reset_fields)
-reset_button.grid(row=2, column=1, padx=10, pady=10)
+reset_button.grid(row=3, column=0, columnspan=2, pady=10)
 
 # Run the application
 root.mainloop()
